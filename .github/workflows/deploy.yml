@@ -1,0 +1,31 @@
+name: Deploy  multi-container-app
+
+on: 
+  push: 
+    branches: 
+      - main
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run:  docker login -u ${{ secrets.DOCKER_NAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - run: docker build -t evrad7/multi-client-test -f ./client/Dockerfile.dev ./client
+      - run: docker run -e CI=true evrad7/multi-client-test npm run test
+
+
+      - run: docker build -t evrad7/multi-client ./client
+      - run: docker build -t evrad7/multi-server ./server
+      - run: docker build -t evrad7/multi-worker ./worker
+      - run: docker build -t evrad7/multi-nginx ./nginx
+
+      - run: docker push evrad7/multi-client
+      - run: docker push evrad7/multi-server
+      - run: docker push evrad7/multi-worker
+      - run: docker push evrad7/multi-nginx
+
+            
+
+
