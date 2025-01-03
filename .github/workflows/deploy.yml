@@ -26,6 +26,24 @@ jobs:
       - run: docker push evrad7/multi-worker
       - run: docker push evrad7/multi-nginx
 
+
+
+
+      - name: Generate deployment package
+        # run: zip -r deploy.zip . -x '*.git*'
+        run: zip -r deploy.zip docker-compose.yml
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: Complex-Docker-App
+          environment_name: Complex-Docker-App-env
+          version_label: ${{ github.sha }}
+          region: eu-north-1
+          deployment_package: deploy.zip
+
             
 
 
